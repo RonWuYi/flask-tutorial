@@ -12,7 +12,10 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 @bp.route('/')
 def index():
     user_id = session.get('user_id')
-    return 'index page, and {} already logined into this page'.format(user_id)
+    if user_id is None:
+        return 'logout page, and no one into this page'
+    else:
+        return 'index page, user {} already login into this page'.format(user_id)
 
 
 @bp.route('/register', methods=('GET', 'POST'))
