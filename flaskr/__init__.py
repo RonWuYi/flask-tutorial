@@ -25,13 +25,13 @@ def create_app(test_config=None):
         pass
 
     # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-
-    @app.route('/')
-    def index():
-        return 'index page'
+    # @app.route('/hello')
+    # def hello():
+    #     return 'Hello, World!'
+    #
+    # @app.route('/')
+    # def index():
+    #     return 'index page'
 
     from flaskr import db
     db.init_app(app)

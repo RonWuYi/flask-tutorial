@@ -11,7 +11,8 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/')
 def index():
-    return 'index page'
+    user_id = session.get('user_id')
+    return 'index page, and {} already logined into this page'.format(user_id)
 
 
 @bp.route('/register', methods=('GET', 'POST'))
@@ -39,6 +40,8 @@ def register():
             db.commit()
             return redirect(url_for('auth.login'))
 
+        flash(error)
+
     return render_template('auth/register.html')
 
 
@@ -62,7 +65,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('index'))
+            return redirect(url_for('auth.index'))
 
         flash(error)
 
@@ -84,7 +87,7 @@ def load_logged_in_user():
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('auth.index'))
 
 
 def login_required(view):
