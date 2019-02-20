@@ -5,10 +5,10 @@ from flaskr.auth import login_required
 from flaskr.db import get_db
 
 
-up = Blueprint('upload', __name__)
+bp = Blueprint('upload', __name__, url_prefix='/upload')
 
 
-@up.route('/upload')
+@bp.route('/')
 @login_required
-def upload():
-    return 'this is a upoad page'
+def index():
+    return 'this is a upload index page'
