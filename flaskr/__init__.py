@@ -29,18 +29,19 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
     #
-    # @app.route('/')
-    # def index():
-    #     return 'index page'
+    @app.route('/')
+    def index():
+        return 'index page'
 
     from flaskr import db
     db.init_app(app)
 
-    from . import auth, blog
+    from . import auth
+    #from . import auth, blog
     app.register_blueprint(auth.bp)
 
     # from . import blog
-    app.register_blueprint(blog.bp)
+    # app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
 
     return app
