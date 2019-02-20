@@ -9,6 +9,10 @@ bp = Blueprint('upload', __name__, url_prefix='/upload')
 
 
 @bp.route('/')
-@login_required
 def index():
     return 'this is a upload index page'
+
+
+@bp.route('/test')
+def test():
+    return 'this is a upload test page'
