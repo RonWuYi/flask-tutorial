@@ -39,6 +39,7 @@ def get_post(id, check_author=True):
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
 def create():
+    """Create a new post for the current usre."""
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
@@ -65,6 +66,7 @@ def create():
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
+    """Upadte a post if the current user is the author."""
     post = get_post(id)
 
     if request.method == 'POST':

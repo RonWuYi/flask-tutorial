@@ -30,13 +30,13 @@ def load_logged_in_user():
         ).fetchone()
 
 
-# @bp.route('/')
-# def index():
-#     user_id = session.get('user_id')
-#     if user_id is None:
-#         return 'logout page, and no one into this page'
-#     else:
-#         return 'index page, user {} already login into this page'.format(user_id)
+@bp.route('/')
+def index():
+    user_id = session.get('user_id')
+    if user_id is None:
+        return 'logout page, and no one into this page'
+    else:
+        return 'index page, user {} already login into this page'.format(user_id)
 
 
 @bp.route('/register', methods=('GET', 'POST'))

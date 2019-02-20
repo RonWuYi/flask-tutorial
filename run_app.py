@@ -1,6 +1,22 @@
-import os
+from flask import Flask, request
 
-os.system('export FLASK_APP = flaskr/__init__.py:create_app')
-os.system('export FLASK_ENV = development')
-os.system('export FLASK_DEBUG = 0')
-os.system('flask run')
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    print('during view')
+    return 'Hello, World!'
+
+
+@app.teardown_appcontext
+def show_terdown(exception):
+    print('after with block')
+
+
+with app.test_request_context():
+    print('during with block')
+
+
+with app.test_client():
+    client.get('/')
+    print(request.path)
