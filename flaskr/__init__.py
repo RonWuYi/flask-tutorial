@@ -4,12 +4,13 @@ from flask import Flask
 
 
 def create_app(test_config=None):
-    # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
     )
+
+    # create and configure the app
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -29,11 +30,16 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
-    @app.route('/')
-    def index():
-        return 'index page'
-
     from flaskr import db
     db.init_app(app)
+
+    from . import auth
+    from . import upload
+
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(upload.up)
+    # app.register_blueprint(blog.bp)
+
+    # app.add_url_rule('/', endpoint='index')
 
     return app
