@@ -2,7 +2,7 @@ import os
 from flask import (Blueprint, flash, g, redirect, render_template,request, url_for)
 from werkzeug.exceptions import abort
 from werkzeug.utils import secure_filename
-
+from datetime import datetime
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
@@ -78,15 +78,32 @@ def upload_file():
             for i in dup_file_lists:
             #     db.execute(
             #         'UPDATE files ()'
+
             #     )
                 try:
-                    db.execute(
-                        'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
-                        (i, 0, None)
+                    cur_file_list = db.execute(
+                        'select file_name from files'
                     )
-                    db.commit()
+                    # db.commit()
                 except db.Error as e:
                     print(e)
+                if i not in cur_file_list:
+                    try:
+                        db.execute(
+                            'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
+                            (i, 0, None)
+                        )
+                        db.commit()
+                    except db.Error as e:
+                        print(e)
+                else:
+                    try:
+                        db.execute(
+                            "UPDATE files SET created={} WHERE file_name={}".format(str(datetime.now())[:19], i)
+                        )
+                        db.commit()
+                    except db.Error as e:
+                        print(e)
             flash('those dup files {} already overwrite'.format(dup_file_lists))
         db.commit()
         if len(new_file_lists) > 0:
