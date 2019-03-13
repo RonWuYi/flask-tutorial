@@ -24,22 +24,34 @@ def index():
 
 @bp.route('/test')
 def test():
-    return 'this is a upload test page'
+    db = get_db()
+    name_list = []
+    cur_list1 = db.execute('select * from files').fetchall()
+    # cur_list2 = db.execute('select * from files').fetchone()
+    # for i in list:
+    #     print(i)
+    for a, b, c, d, e in cur_list1:
+        name_list.append(b)
+    return 'this is a test page list {}'.format(name_list)
 
 
 @bp.route('/uploadfile', methods=['GET', 'POST'])
 def upload_file():
     # x, y, z = os.walk(UPLOAD_FOLDER)
     if request.method == 'POST':
+        db = get_db()
+        error = None
         if 'file' not in request.files:
-            flash('No file part')
+            error = 'No file part'
+            flash(error)
             return redirect(request.url)
         select_files = request.files.getlist('file')
         dup_file_lists = []
         new_file_lists = []
         for f in select_files:
             if f.filename == '':
-                flash('No seleted file')
+                error = 'No seleted file'
+                flash(error)
                 return redirect(request.url)
             if f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
@@ -62,9 +74,32 @@ def upload_file():
                 flash('some files not allowed to upload, upload process cancelled')
 
         if len(dup_file_lists) > 0:
+            for i in dup_file_lists:
+            #     db.execute(
+            #         'UPDATE files ()'
+            #     )
+                try:
+                    db.execute(
+                        'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
+                        (i, 0, None)
+                    )
+                    db.commit()
+                except db.Error as e:
+                    print(e)
             flash('those dup files {} already overwrite'.format(dup_file_lists))
+        db.commit()
         if len(new_file_lists) > 0:
+            for i in new_file_lists:
+                try:
+                    db.execute(
+                        'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
+                        (i, 0, None)
+                    )
+                    db.commit()
+                except db.Error as e:
+                    print(e)
             flash('those new files {} already uploaded'.format(new_file_lists))
+
         return redirect(url_for('upload.upload_file'))
     else:
         new_files = os.listdir(UPLOAD_FOLDER)
