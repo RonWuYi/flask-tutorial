@@ -29,11 +29,14 @@ def test():
 
 @bp.route('/uploadfile', methods=['GET', 'POST'])
 def upload_file():
+    # x, y, z = os.walk(UPLOAD_FOLDER)
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
         select_files = request.files.getlist('file')
+        dup_file_lists = []
+        new_file_lists = []
         for f in select_files:
             if f.filename == '':
                 flash('No seleted file')
@@ -41,23 +44,45 @@ def upload_file():
             if f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
                 if os.path.exists(UPLOAD_FOLDER):
+
                     # Todo "not finished yet"
                     if os.path.isfile(os.path.join(UPLOAD_FOLDER, filename)):
+                        # return redirect('/')
+                        dup_file_lists.append(filename)
+                        # flash('{} will be covered'.format(filename))
                         f.save(os.path.join(UPLOAD_FOLDER, filename))
                     else:
-                        pass
-                        
+                        new_file_lists.append(filename)
+                        f.save(os.path.join(UPLOAD_FOLDER, filename))
+                   # f.save(os.path.join(UPLOAD_FOLDER, filename))
                 else:
                     os.makedirs(UPLOAD_FOLDER)
                     f.save(os.path.join(UPLOAD_FOLDER, filename))
-        return redirect(url_for('upload.upload_file',
-                        filename=filename))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-        <input type=file name=file multiple>
-        <input type=submit value=Upload>
-    </form>
-    '''
+            else:
+                flash('some files not allowed to upload, upload process cancelled')
+
+        if len(dup_file_lists) > 0:
+            flash('those dup files {} already overwrite'.format(dup_file_lists))
+        if len(new_file_lists) > 0:
+            flash('those new files {} already uploaded'.format(new_file_lists))
+        return redirect(url_for('upload.upload_file'))
+    else:
+        new_files = os.listdir(UPLOAD_FOLDER)
+        return render_template('/up/up.html', new_files=new_files)
+
+    # return '''
+    # <!doctype html>
+    # <title>Upload new File</title>
+    # <h1>Upload new File</h1>
+    # <form method=post enctype=multipart/form-data>
+    #     <input type=file name=file multiple>
+    #     <input type=submit value=Upload>
+    # </form>
+    # <ul>
+    # {% for file in new_files %}
+    #     <li><a href='/'>{{ file.filename }}</li>
+    # {% endfor %}
+    # </ul>
+    # '''
+    # new_files = os.listdir(UPLOAD_FOLDER)
+    # return render_template('/up/up.html', new_files=new_files)
