@@ -25,14 +25,15 @@ def index():
 @bp.route('/test')
 def test():
     db = get_db()
-    name_list = []
+    # name_list = []
     cur_list1 = db.execute('select * from files').fetchall()
     # cur_list2 = db.execute('select * from files').fetchone()
     # for i in list:
     #     print(i)
-    for a, b, c, d, e in cur_list1:
-        name_list.append(b)
-    return 'this is a test page list {}'.format(name_list)
+    # for a, b, c, d, e in cur_list1:
+    #     name_list.append(b)
+    # return 'this is a test page list {}'.format(name_list)
+    return render_template('/up/table.html', items=cur_list1)
 
 
 @bp.route('/uploadfile', methods=['GET', 'POST'])
