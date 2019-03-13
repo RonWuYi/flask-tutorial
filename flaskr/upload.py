@@ -41,7 +41,12 @@ def upload_file():
             if f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
                 if os.path.exists(UPLOAD_FOLDER):
-                    f.save(os.path.join(UPLOAD_FOLDER, filename))
+                    # Todo "not finished yet"
+                    if os.path.isfile(os.path.join(UPLOAD_FOLDER, filename)):
+                        f.save(os.path.join(UPLOAD_FOLDER, filename))
+                    else:
+                        pass
+                        
                 else:
                     os.makedirs(UPLOAD_FOLDER)
                     f.save(os.path.join(UPLOAD_FOLDER, filename))
