@@ -90,8 +90,8 @@ def upload_file():
                 if i not in cur_file_list:
                     try:
                         db.execute(
-                            'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
-                            (i, 0, None)
+                            'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
+                            (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
                         )
                         db.commit()
                     except db.Error as e:
@@ -110,8 +110,8 @@ def upload_file():
             for i in new_file_lists:
                 try:
                     db.execute(
-                        'INSERT INTO files (file_name, checked, strong) VALUES (?, ?, ?)',
-                        (i, 0, None)
+                        'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
+                        (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
                     )
                     db.commit()
                 except db.Error as e:
@@ -120,8 +120,13 @@ def upload_file():
 
         return redirect(url_for('upload.upload_file'))
     else:
-        new_files = os.listdir(UPLOAD_FOLDER)
-        return render_template('/up/up.html', new_files=new_files)
+        try:
+            new_files = os.listdir(UPLOAD_FOLDER)
+            return render_template('/up/up.html', new_files=new_files)
+        except FileNotFoundError as e:
+            flash(e)
+            return render_template('/up/up.html', new_files=None)
+        # return render_template('/up/up.html', new_files=new_files)
 
     # return '''
     # <!doctype html>

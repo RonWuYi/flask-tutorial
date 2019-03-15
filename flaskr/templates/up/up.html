@@ -21,9 +21,12 @@
     </form>
     <h1>Members</h1>
     <ul>
-    {% for file in new_files %}
-      <li>{{ file }}</li>
-    {% endfor %}
+      {% if new_files %}
+        {% for file in new_files %}
+          <li>{{ file }}</li>
+        {% endfor %}
+      {% else %}
+        {{" empty list "}}
+      {% endif %}
     </ul>
-
 {% endblock %}

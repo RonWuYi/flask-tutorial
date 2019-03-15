@@ -3,13 +3,18 @@
 <TR>
    <TD class="c1">{{item.id}}</TD>
    <TD class="c2">{{item.file_name}}</TD>
-   <TD class="c3">{{item.created}}</TD>
-   <TD class="c4">{{item.checked}}</TD>
-   <TD class="c5">{{item.strong}}</TD>
+   <TD class="c3">{{item.file_path}}</TD>
+   <TD class="c4">{{item.created}}</TD>
+   <TD class="c5">{{item.checked}}</TD>
+   <TD class="c6">{{item.strong}}</TD>
+   <TD><form method=delete>
+        <input type=submit value=Delete>
+       </form>
+   </TD>
 </TR>
-<form method=delete>
-  <!--<input type=file name=file multiple>-->
-  <input type=submit value=Delete>
-</form>
+<!--<form method=delete>-->
+  <!--&lt;!&ndash;<input type=file name=file multiple>&ndash;&gt;-->
+  <!--<input type=submit value=Delete>-->
+<!--</form>-->
 {% endfor %}
 </table>
