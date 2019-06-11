@@ -94,3 +94,10 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
+
+@bp.route('/')
+def root():
+    # session.clear()
+    # return redirect(url_for('index'))
+    return render_template('auth/root.html')
