@@ -144,3 +144,7 @@ def upload_file():
     # '''
     # new_files = os.listdir(UPLOAD_FOLDER)
     # return render_template('/up/up.html', new_files=new_files)
+
+
+# if __name__ == '__main__':
+#     bp.run()
