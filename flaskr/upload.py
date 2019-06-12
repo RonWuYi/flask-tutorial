@@ -23,7 +23,8 @@ else:
         os.makedirs(os.path.join(Path.cwd(), 'uploadfiles'))
     UPLOAD_FOLDER = os.path.join(Path.cwd(), 'uploadfiles')
 
-ALLOWED_EXTENSIONS = set(['txt', 'jpg', 'jpeg', 'png'])
+# ALLOWED_EXTENSIONS = set(['txt', 'jpg', 'jpeg', 'png'])
+ALLOWED_EXTENSIONS = {'txt', 'jpg', 'jpeg', 'png'}
 
 bp = Blueprint('upload', __name__, url_prefix='/upload')
 
@@ -41,14 +42,7 @@ def index():
 @bp.route('/test')
 def test():
     db = get_db()
-    # name_list = []
     cur_list1 = db.execute('select * from files').fetchall()
-    # cur_list2 = db.execute('select * from files').fetchone()
-    # for i in list:
-    #     print(i)
-    # for a, b, c, d, e in cur_list1:
-    #     name_list.append(b)
-    # return 'this is a test page list {}'.format(name_list)
     return render_template('/up/table.html', items=cur_list1)
 
 
@@ -73,17 +67,13 @@ def upload_file():
             if f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
                 if os.path.exists(UPLOAD_FOLDER):
-
                     # Todo "not finished yet"
                     if os.path.isfile(os.path.join(UPLOAD_FOLDER, filename)):
-                        # return redirect('/')
                         dup_file_lists.append(filename)
-                        # flash('{} will be covered'.format(filename))
                         f.save(os.path.join(UPLOAD_FOLDER, filename))
                     else:
                         new_file_lists.append(filename)
                         f.save(os.path.join(UPLOAD_FOLDER, filename))
-                   # f.save(os.path.join(UPLOAD_FOLDER, filename))
                 else:
                     os.makedirs(UPLOAD_FOLDER)
                     f.save(os.path.join(UPLOAD_FOLDER, filename))
@@ -92,26 +82,30 @@ def upload_file():
 
         if len(dup_file_lists) > 0:
             for i in dup_file_lists:
-            #     db.execute(
-            #         'UPDATE files ()'
-
-            #     )
                 try:
                     cur_file_list = db.execute(
                         'select file_name from files'
                     )
-                    # db.commit()
+                    if i not in cur_file_list:
+                        try:
+                            db.execute(
+                                'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
+                                (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
+                            )
+                            db.commit()
+                        except db.Error as e:
+                            print(e)
                 except db.Error as e:
                     print(e)
-                if i not in cur_file_list:
-                    try:
-                        db.execute(
-                            'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
-                            (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
-                        )
-                        db.commit()
-                    except db.Error as e:
-                        print(e)
+                # if i not in cur_file_list:
+                #     try:
+                #         db.execute(
+                #             'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
+                #             (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
+                #         )
+                #         db.commit()
+                #     except db.Error as e:
+                #         print(e)
                 else:
                     try:
                         db.execute(
@@ -142,25 +136,3 @@ def upload_file():
         except FileNotFoundError as e:
             flash(e)
             return render_template('/up/up.html', new_files=None)
-        # return render_template('/up/up.html', new_files=new_files)
-
-    # return '''
-    # <!doctype html>
-    # <title>Upload new File</title>
-    # <h1>Upload new File</h1>
-    # <form method=post enctype=multipart/form-data>
-    #     <input type=file name=file multiple>
-    #     <input type=submit value=Upload>
-    # </form>
-    # <ul>
-    # {% for file in new_files %}
-    #     <li><a href='/'>{{ file.filename }}</li>
-    # {% endfor %}
-    # </ul>
-    # '''
-    # new_files = os.listdir(UPLOAD_FOLDER)
-    # return render_template('/up/up.html', new_files=new_files)
-
-
-# if __name__ == '__main__':
-#     bp.run()
