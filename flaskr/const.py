@@ -1,7 +1,10 @@
 import platform
 
-from pathlib import Path
+LINUX = 'Linux'
 
 
-def inlinux():
-    pass
+def in_linux():
+    if platform.system() == LINUX:
+        return True
+    else:
+        return False

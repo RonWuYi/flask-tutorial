@@ -6,8 +6,23 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from pathlib import Path
+from . import const
 
-UPLOAD_FOLDER = '/tmp/uploadfiles'
+if const.in_linux():
+    if os.path.exists('/tmp/uploadfiles'):
+        pass
+        # UPLOAD_FOLDER = '/tmp/uploadfiles'
+    else:
+        os.makedirs('/tmp/uploadfiles')
+    UPLOAD_FOLDER = '/tmp/uploadfiles'
+else:
+    if os.path.exists(os.path.join(Path.cwd(), 'uploadfiles')):
+        pass
+    else:
+        os.makedirs(os.path.join(Path.cwd(), 'uploadfiles'))
+    UPLOAD_FOLDER = os.path.join(Path.cwd(), 'uploadfiles')
+
 ALLOWED_EXTENSIONS = set(['txt', 'jpg', 'jpeg', 'png'])
 
 bp = Blueprint('upload', __name__, url_prefix='/upload')
