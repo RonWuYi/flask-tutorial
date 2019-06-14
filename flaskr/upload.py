@@ -1,10 +1,7 @@
 import os
 
-from flask import (Blueprint, flash, g, redirect, render_template,request, url_for)
-from werkzeug.exceptions import abort
+from flask import (Blueprint, flash, redirect, render_template, request, url_for)
 from werkzeug.utils import secure_filename
-from datetime import datetime
-from flaskr.auth import login_required
 from flaskr.db import get_db
 from pathlib import Path
 from . import const
@@ -12,18 +9,16 @@ from . import const
 if const.in_linux():
     if os.path.exists('/tmp/uploadfiles'):
         pass
-        # UPLOAD_FOLDER = '/tmp/uploadfiles'
     else:
         os.makedirs('/tmp/uploadfiles')
     UPLOAD_FOLDER = '/tmp/uploadfiles'
 else:
-    if os.path.exists(os.path.join(Path.cwd(), 'uploadfiles')):
+    if os.path.exists(os.path.join(str(Path.cwd()), 'uploadfiles')):
         pass
     else:
-        os.makedirs(os.path.join(Path.cwd(), 'uploadfiles'))
-    UPLOAD_FOLDER = os.path.join(Path.cwd(), 'uploadfiles')
+        os.makedirs(os.path.join(str(Path.cwd()), 'uploadfiles'))
+    UPLOAD_FOLDER = os.path.join(str(Path.cwd()), 'uploadfiles')
 
-# ALLOWED_EXTENSIONS = set(['txt', 'jpg', 'jpeg', 'png'])
 ALLOWED_EXTENSIONS = {'txt', 'jpg', 'jpeg', 'png'}
 
 bp = Blueprint('upload', __name__, url_prefix='/upload')
@@ -48,26 +43,20 @@ def test():
 
 @bp.route('/uploadfile', methods=['GET', 'POST'])
 def upload_file():
-    # x, y, z = os.walk(UPLOAD_FOLDER)
     if request.method == 'POST':
         db = get_db()
         error = None
         if 'file' not in request.files:
-            error = 'No file part'
+            error = 'No seleted file'
             flash(error)
             return redirect(request.url)
         select_files = request.files.getlist('file')
         dup_file_lists = []
         new_file_lists = []
         for f in select_files:
-            if f.filename == '':
-                error = 'No seleted file'
-                flash(error)
-                return redirect(request.url)
             if f and allowed_file(f.filename):
                 filename = secure_filename(f.filename)
                 if os.path.exists(UPLOAD_FOLDER):
-                    # Todo "not finished yet"
                     if os.path.isfile(os.path.join(UPLOAD_FOLDER, filename)):
                         dup_file_lists.append(filename)
                         f.save(os.path.join(UPLOAD_FOLDER, filename))
@@ -79,43 +68,8 @@ def upload_file():
                     f.save(os.path.join(UPLOAD_FOLDER, filename))
             else:
                 flash('some files not allowed to upload, upload process cancelled')
-
         if len(dup_file_lists) > 0:
-            for i in dup_file_lists:
-                try:
-                    cur_file_list = db.execute(
-                        'select file_name from files'
-                    )
-                    if i not in cur_file_list:
-                        try:
-                            db.execute(
-                                'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
-                                (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
-                            )
-                            db.commit()
-                        except db.Error as e:
-                            print(e)
-                except db.Error as e:
-                    print(e)
-                # if i not in cur_file_list:
-                #     try:
-                #         db.execute(
-                #             'INSERT INTO files (file_name, file_path, checked, strong) VALUES (?, ?, ?, ?)',
-                #             (i, os.path.join(UPLOAD_FOLDER, i), 0, None)
-                #         )
-                #         db.commit()
-                #     except db.Error as e:
-                #         print(e)
-                else:
-                    try:
-                        db.execute(
-                            "UPDATE files SET created={} WHERE file_name={}".format(str(datetime.now())[:19], i)
-                        )
-                        db.commit()
-                    except db.Error as e:
-                        print(e)
             flash('those dup files {} already overwrite'.format(dup_file_lists))
-        db.commit()
         if len(new_file_lists) > 0:
             for i in new_file_lists:
                 try:
@@ -127,8 +81,9 @@ def upload_file():
                 except db.Error as e:
                     print(e)
             flash('those new files {} already uploaded'.format(new_file_lists))
-
-        return redirect(url_for('upload.upload_file'))
+        cur_list2 = db.execute('select * from files').fetchall()
+        return render_template('/up/up.html', items=cur_list2)
+        # return redirect(url_for('upload.upload_file'))
     else:
         try:
             new_files = os.listdir(UPLOAD_FOLDER)
