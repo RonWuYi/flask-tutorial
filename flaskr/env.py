@@ -20,6 +20,7 @@ def index():
 
     return render_template('env/index.html', envs=envs)
 
+
 @bp.route('/env/create', methods=('GET', 'POST'))
 @login_required
 def create():
@@ -86,10 +87,25 @@ def create():
         
 #     return post
 
+def get_env(id, check_creator=True):
+    env = get_db().execute(
+        'SELECT e.id, env_name, created, user_id'
+        ' FROM env e JOIN user u ON e.user_id = u.id'
+        ' WHERE e.id = ?',
+        (id,)
+    ).fetchone()
+    
+    if env is None:
+        abort(404, f'Env id {id} does not exists.')
+    if check_creator and env['user_id'] != g.user['id']:
+        abort(403)
+        
+    return env
+
 @bp.route('/env/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
-    post  = get_post(id)
+    env = get_env(id)
     
     if request.method == 'POST':
         title = request.form['title']
@@ -111,7 +127,7 @@ def update(id):
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('blog/update.html', post=post)
+    return render_template('env/update.html', env=env)
         
     
 @bp.route('/<int:id>/delete', methods=('POST',))
