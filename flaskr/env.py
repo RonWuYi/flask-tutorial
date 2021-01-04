@@ -5,61 +5,88 @@ from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
+from .utilities import devices, devices_sql
 
 bp = Blueprint('env', __name__)
 
-@bp.route('/')
+@bp.route('/env')
 def index():
     db  = get_db()
-    posts = db.execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
+    envs = db.execute(
+        'SELECT e.id, user_id, created, env_name'
+        ' FROM env e JOIN user u ON e.user_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
 
-    return render_template('blog/index.html', posts=posts)
+    return render_template('env/index.html', envs=envs)
 
-@bp.route('/create', methods=('GET', 'POST'))
+@bp.route('/env/create', methods=('GET', 'POST'))
 @login_required
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        envname = request.form.get('envname')
+        priority_level = request.form.get('priority_level')
+        kms_id = request.form.get('kms_id')
+        agent_id = request.form.get('agent_id')
+        itms_id = request.form.get('itms_id')
+        # iks_id = request.form.get('iks_id')
+        # pes_id = request.form.get('pes_id')
+        # ccis_id = request.form.get('ccis_id')
+        # pg_id = request.form.get('pg_id')
+
         error = None
-        
-        if not title:
-            error = 'Title is required.'
-            
+
+        if not envname:
+            error = 'envname is required.'
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                # 'INSERT INTO env (user_id, env_name, kms_id, agent_id, itms_id, iks_id, pes_id, ccis_id, pg_id, priority_level)'
+                'INSERT INTO env (user_id, env_name, kms_id, agent_id, itms_id, priority_level)'
+                ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                (g.user['id'], 
+                 envname, 
+                 kms_id, 
+                 agent_id, 
+                 itms_id, 
+                #  iks_id, 
+                #  pes_id, 
+                #  ccis_id, 
+                #  pg_id, 
+                 priority_level)
             )
             db.commit()
-            return redirect(url_for('blog.index'))
-    return render_template('blog/create.html')
+            return redirect(url_for('env.index'))
 
-def get_post(id, check_author=True):
-    post = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
-    ).fetchone()
+    return render_template('envs/create.html', 
+                            kms=devices(devices_sql.format('kms')), 
+                            agent=devices(devices_sql.format('agent')), 
+                            itms=devices(devices_sql.format('itms'))
+                            # iks=devices(devices_sql.format('iks')), 
+                            # pes=devices(devices_sql.format('pes')),
+                            # ccis=devices(devices_sql.format('ccis')), 
+                            # pg=devices(devices_sql.format('pg'))
+                            )
 
-    if post is None:
-        abort(404, f'Post id {id} does not exists.')
+# def get_post(id, check_author=True):
+#     post = get_db().execute(
+#         'SELECT p.id, title, body, created, author_id, username'
+#         ' FROM post p JOIN user u ON p.author_id = u.id'
+#         ' WHERE p.id = ?',
+#         (id,)
+#     ).fetchone()
 
-    if check_author and post['author_id'] != g.user['id']:
-        abort(403)
+#     if post is None:
+#         abort(404, f'Post id {id} does not exists.')
+
+#     if check_author and post['author_id'] != g.user['id']:
+#         abort(403)
         
-    return post
+#     return post
 
-@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@bp.route('/env/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
     post  = get_post(id)
