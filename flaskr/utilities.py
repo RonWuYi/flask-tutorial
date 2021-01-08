@@ -5,7 +5,7 @@ devices_sql = 'SELECT * FROM {} WHERE private_device = 0'
 empty_env_sql = 'SELECT * FROM {} WHERE private_device is NULL'
 empty_sql = 'SELECT * FROM {} WHERE {} is NULL'
 
-def get_env(id, check_user=True):
+def get_kms(id, check_user=True):
     env = get_db().execute(
         'SELECT p.id, env_name, created, user_id'
         ' FROM env p JOIN user u ON p.user_id = u.id'

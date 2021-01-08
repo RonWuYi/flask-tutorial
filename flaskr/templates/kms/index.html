@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Kms list{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('kms.create') }}">add kms</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% for post in posts %}
+    <article class="kms">
+      <header>
+        <div>
+          <h1>{{ kms['kms_user'] }}</h1>
+          <h1>{{ kms['kms_ip'] }}</h1>
+          <h1>{{ kms['db_ip'] }}</h1>
+          <div class="about">by {{ g.user['username'] }} on {{ kms['created'].strftime('%Y-%m-%d') }}</div>
+        </div>
+        {% if g.user['id'] == kms['author_id'] %}
+          <a class="action" href="{{ url_for('kms.update', id=kms['id']) }}">Edit</a>
+        {% endif %}
+      </header>
+      <!-- <p class="body">{{ post['body'] }}</p> -->
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

@@ -37,4 +37,7 @@ def create_app(test_config=None):
     app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
     
+    from . import kms 
+    app.register_blueprint(kms.bp)
+    app.add_url_rule('/kms', endpoint='index')
     return app

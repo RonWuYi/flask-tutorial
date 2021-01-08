@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Add Kms{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="env_id">env_id</label>
+      <select name="env_id">
+        {% for i in env %}
+          <option value="{{ i['env_name'] }}">{{ i['env_name'] }}</option>
+        {% endfor %}
+      </select>
+    <label for="kms_user">kms_user</label>
+    <input name="kms_user" id="kms_user" value="{{ request.form['kms_user'] }}">
+    <label for="kms_password">kms_password</label>
+    <input name="kms_password" id="kms_password" value="{{ request.form['kms_password'] }}">
+    <label for="kms_ip">kms_ip</label>
+    <input name="kms_ip" id="kms_ip" placeholder="xxx.xxx.xxx.xxx" value="{{ request.form['kms_ip'] }}">
+    <label for="domain_name">domain_name</label>
+    <input name="domain_name" id="domain_name" value="{{ request.form['domain_name'] }}">
+    <label for="test_root_folder">test_root_folder</label>
+    <input name="test_root_folder" id="test_root_folder" value="{{ request.form['test_root_folder'] }}">
+    <label for="branch">branch</label>
+    <input name="branch" id="branch" value="{{ request.form['branch'] }}">
+    <label for="db_name">db_name</label>
+    <input name="db_name" id="db_name" value="{{ request.form['db_name'] }}">
+    <label for="db_user">db_user</label>
+    <input name="db_user" id="db_user" value="{{ request.form['db_user'] }}">
+    <label for="db_password">db_password</label>
+    <input name="db_password" id="db_password" value="{{ request.form['db_password'] }}">
+    <label for="db_host">db_host</label>
+    <input name="db_host" id="db_host" value="{{ request.form['db_host'] }}">
+    <label for="db_ip">db_ip</label>
+    <input name="db_ip" id="db_ip" value="{{ request.form['db_ip'] }}">
+    <!-- <div> -->
+      <label for="sa_name">sa_name</label>
+      <input name="sa_name" id="sa_name" value="{{ request.form['sa_name'] }}">
+    <!-- </div> -->
+   
+    <!-- <div> -->
+      <label for="sa_password">sa_password</label>
+      <input name="sa_password" id="sa_password" value="{{ request.form['sa_password'] }}">
+    <!-- </div> -->
+   
+    <div>
+      <label>private_device</label>
+      <input type="checkbox" id="private_device" name="private_device" value="1">
+    </div>
+    <!-- <label>private_device</label> -->
+      <!-- <label for="1">1</label><br><br> -->
+    <!-- <div> -->
+      <!-- <label for="priority_level">priority level</label>
+        <select name="priority_level">
+          {% for i in range(1, 4) %}
+            <option value="{{ i }}">{{ i }}</option>
+          {% endfor %}
+        </select> -->
+    <!-- </div> -->
+
+    <input type="submit" value="Save">
+  </form>
+{% endblock %}
