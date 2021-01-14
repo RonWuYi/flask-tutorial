@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Envs{% endblock %}</h1>
+  {% if g.user %}
+    <a class="action" href="{{ url_for('env.create') }}">Create an env</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% for env in envs %}
+    <article class="env">
+      <header>
+        <div>
+          <h1>{{ env['env_name'] }}</h1>
+          <div class="about">by {{ g.user['username'] }} on {{ env['created'].strftime('%Y-%m-%d') }}</div>
+        </div>
+        {% if g.user['id'] == env['user_id'] %}
+          <a class="action" href="{{ url_for('env.update', id=env['id']) }}">Edit</a>
+          <input type="submit" value="Start basic test">
+        {% endif %}
+      </header>
+    </article>
+    {% if not loop.last %}
+      <hr>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

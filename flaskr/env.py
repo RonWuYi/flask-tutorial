@@ -18,7 +18,7 @@ def index():
         ' ORDER BY created DESC'
     ).fetchall()
 
-    return render_template('env/index.html', envs=envs)
+    return render_template('envs/index.html', envs=envs)
 
 
 @bp.route('/env/create', methods=('GET', 'POST'))
@@ -26,10 +26,11 @@ def index():
 def create():
     if request.method == 'POST':
         envname = request.form.get('envname')
-        priority_level = request.form.get('priority_level')
         kms_id = request.form.get('kms_id')
         agent_id = request.form.get('agent_id')
         itms_id = request.form.get('itms_id')
+        priority_level = request.form.get('priority_level')
+
         # iks_id = request.form.get('iks_id')
         # pes_id = request.form.get('pes_id')
         # ccis_id = request.form.get('ccis_id')
@@ -46,7 +47,7 @@ def create():
             db.execute(
                 # 'INSERT INTO env (user_id, env_name, kms_id, agent_id, itms_id, iks_id, pes_id, ccis_id, pg_id, priority_level)'
                 'INSERT INTO env (user_id, env_name, kms_id, agent_id, itms_id, priority_level)'
-                ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                ' VALUES (?, ?, ?, ?, ?, ?)',
                 (g.user['id'], 
                  envname, 
                  kms_id, 
@@ -127,14 +128,14 @@ def update(id):
             db.commit()
             return redirect(url_for('blog.index'))
 
-    return render_template('env/update.html', env=env)
+    return render_template('envs/update.html', env=env)
         
     
-@bp.route('/<int:id>/delete', methods=('POST',))
+@bp.route('/env/<int:id>/delete', methods=('POST',))
 @login_required
 def delete(id):
-    get_post(id)
+    get_env(id)
     db = get_db()
     db.execute('DELETE FROM post WHERE id = ?', (id,))
     db.commit()
-    return redirect(url_for('blog.index'))
+    return redirect(url_for('env.index'))

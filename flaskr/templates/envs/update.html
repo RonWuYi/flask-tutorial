@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Edit "{{ env['env_name'] }}"{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <label for="env_name">env_name</label>
+    <input name="env_name" id="env_name" value="{{ request.form['env_name'] or env['env_name'] }}">
+    
+    <label for="kms_id">kms_id</label>
+      <select name="kms_id">
+        {% for i in kms %}
+          <option value="{{ i['id'] }}, {{i['kms_ip']}}">{{ i['id'] }}, {{i['kms_ip']}}</option>
+        {% endfor %}
+      </select>  
+    <label for="agent_id">agent_id</label>
+      <select name="agent_id">
+        {% for i in agent %}
+          <option value="{{ i['id'] }}, {{i['agent_ip']}}">{{ i['id'] }}, {{i['agent_ip']}}</option>
+        {% endfor %}
+      </select>  
+    <label for="itms_id">itms_id</label>
+      <select name="itms_id">
+        {% for i in itms %}
+          <option value="{{ i['id'] }}, {{i['itms_ip']}}">{{ i['id'] }}, {{i['itms_ip']}}</option>
+        {% endfor %}
+      </select>
+
+    <div>
+      <label for="priority_level">priority level</label>
+        <select name="priority_level">
+          {% for i in range(1, 4) %}
+            <option value="{{ i }}">{{ i }}</option>
+          {% endfor %}
+        </select>
+    </div>
+    <input type="submit" value="Save">
+  </form>
+  <hr>
+  <form action="{{ url_for('env.delete', id=env['id']) }}" method="post">
+    <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+  </form>
+{% endblock %}
