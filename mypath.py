@@ -7,7 +7,7 @@ c = conn.cursor()
 
 mylist = c.execute(
     '''
-    SELECT * from kms
+    SELECT * from env 
     '''
 ).fetchall()
 print(len(mylist))
